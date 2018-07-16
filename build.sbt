@@ -6,6 +6,9 @@ resolvers += Resolver.jcenterRepo
 
 scalaVersion := "2.12.4"
 libraryDependencies ++= Seq(
+
+  "edu.holycross.shot" %% "citerelations" % "2.3.0",
+  "edu.holycross.shot" %% "cex" % "6.2.1",
   "edu.holycross.shot.cite" %% "xcite" % "3.5.0",
   "edu.holycross.shot" %% "ohco2" % "10.9.0",
   "edu.holycross.shot" %% "dse" % "3.2.0",
