@@ -7,8 +7,7 @@ import edu.holycross.shot.cite._
 
 // The data files in this repo:
 val nameList = "data/speakersList.cex"
-val speechList = "data/speeches.cex"
-
+val speechList = "data/linesPerSpeech.cex"
 
 /** A Speaker.
 * @param urn Idenfitier in hmt's personal name collection.
@@ -23,7 +22,7 @@ case class Speaker (urn: Cite2Urn, label: String, gender: String)
 * @param speaker The speaker.
 * @param passage Range of Iliadic lines for this speech.
 */
-case class Speech (speech: Cite2Urn, speaker: Speaker, passage: CtsUrn)
+case class Speech (speech: Cite2Urn, speaker: Speaker, passage: CtsUrn, lineCount: Int)
 
 
 
@@ -59,7 +58,8 @@ def speechOpts(fileName: String) :  Vector[Option[Speech]]= {
     try {
       val speechUrn = Cite2Urn(cols(0))
       val speakerUrn = Cite2Urn(cols(1))
-      val psg = CtsUrn(cols(2))
+      val psg = CtsUrn(cols(3))
+      val count = cols(4).toInt
       val speakerMatches = speakers.filter(_.urn == speakerUrn)
 
       if (speakerMatches.isEmpty) {
@@ -69,7 +69,7 @@ def speechOpts(fileName: String) :  Vector[Option[Speech]]= {
         None
       } else {
         //println("Speaker " + speakerMatches(0))
-        Some(Speech(speechUrn, speakerMatches(0) ,psg))
+        Some(Speech(speechUrn, speakerMatches(0) ,psg, count))
       }
 
 
@@ -153,23 +153,10 @@ def summary : Unit = {
 
 
 
-
-/*
-
-
-
-
-
-println("\n\nTo see information on an individual speaker:")
-println("\n\tspeakerReport(\"LABEL\")")
-println("\nwhere LABEL is (part of) a labelling string,e.g.")
-println("\n\tspeakerReport(\"Achilles\")")
-*/
-
-
+def linesForSpeeches(speechList: Vector[Speech]): Int = {
+  0
+}
 /*n
-val speakingFolks = speeches.map(_.speaker).distinct
-
 
 
 val grouped  = speeches.groupBy(_.speaker)
