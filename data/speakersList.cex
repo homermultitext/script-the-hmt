@@ -1,3 +1,4 @@
+urn#label#gender
 urn:cite2:hmt:pers.v1:pers1#Achilles#m
 urn:cite2:hmt:pers.v1:pers172#Hector#m
 urn:cite2:hmt:pers.v1:pers22#Agamemnon#m
@@ -68,7 +69,7 @@ urn:cite2:hmt:pers.v1:pers454#Asteropaeus#m
 urn:cite2:hmt:pers.v1:pers593#Itymoneus#m
 urn:cite2:hmt:pers.v1:pers310#Thersites#m
 urn:cite2:hmt:pers.v1:pers659#Themis#f
-urn:cite2:hmt:pers.v1:pers566#Terpsichore#v
+urn:cite2:hmt:pers.v1:pers566#Terpsichore#f
 urn:cite2:hmt:pers.v1:pers663#Hieronymus#m
 urn:cite2:hmt:pers.v1:pers35#Leto#f
 urn:cite2:hmt:pers.v1:pers113#Briseis#f
