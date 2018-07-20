@@ -68,7 +68,6 @@ def speechOpts(fileName: String) :  Vector[Option[Speech]]= {
 
         None
       } else {
-        //println("Speaker " + speakerMatches(0))
         Some(Speech(speechUrn, speakerMatches(0) ,psg, count))
       }
 
@@ -94,8 +93,6 @@ def loadSpeeches(fileName: String) = {
 }
 val speeches = loadSpeeches(speechList)
 val distinctSpeakers = speeches.map(_.speaker).distinct
-
-
 
 
 /** Print a summary report to standard output
@@ -135,27 +132,62 @@ def speakerSummary(label: String) : Unit = {
 }
 
 
+def linesForSpeeches(speechList: Vector[Speech]): Int = {
+  speechList.map(_.lineCount).sum
+}
+
 /** Print a summary to standard output. */
 def summary : Unit = {
-  val speechData = Source.fromFile(speechList).getLines.toVector
-  println("\n\nINPUTDATA")
+  val originalData = "data/speeches.cex"
+  val speechData = Source.fromFile(originalData).getLines.toVector.drop(1)
+  println("\n\nINPUT DATA")
   println("Speech data read from  " + speechData.size + " lines of data.")
-  println("No speaker assigned for " + speechOptions.filter(_ == None).size + " data lines.")
 
-  println("\n\nSPEECH OBJECTS")
-  println("Total speeches: " + speeches.size )
+
+  println("\n\nSPEAKER AND SPEECH OBJECTS")
   println("Total speakers: " + distinctSpeakers.size )
-  println("\tby male speakers: " + distinctSpeakers.filter(_.gender == "m").size)
-  println("\tby female speakers: " + distinctSpeakers.filter(_.gender == "f").size)
+  val maleSpeakers = distinctSpeakers.filter(_.gender == "m")
 
+  print("\tmale speakers: " + maleSpeakers.size )
+  val mSpkrPct = maleSpeakers.size.toFloat / distinctSpeakers.size
+  println(s" (${java.text.NumberFormat.getPercentInstance.format(mSpkrPct)})")
+
+
+   val femaleSpeakers = distinctSpeakers.filter(_.gender == "f")
+   print("\tfemale speakers: " + femaleSpeakers.size )
+   val fSpkrPct = femaleSpeakers.size.toFloat / distinctSpeakers.size
+   println(s" (${java.text.NumberFormat.getPercentInstance.format(fSpkrPct)})")
+
+   println("\nTotal speeches: " + speeches.size )
+   val maleSpeeches = speeches.filter(_.speaker.gender == "m")
+   print("\tby male speakers: " + maleSpeeches.size)
+   val mSpchPct = maleSpeeches.size.toFloat / speeches.size
+   println(s" (${java.text.NumberFormat.getPercentInstance.format(mSpchPct)})")
+
+
+   val femaleSpeeches = speeches.filter(_.speaker.gender == "f")
+   print("\tby female speakers: " + femaleSpeeches.size)
+   val fSpchPct = femaleSpeeches.size.toFloat / speeches.size
+   println(s" (${java.text.NumberFormat.getPercentInstance.format(fSpchPct)})")
+
+
+   println("\nTotal Iliadic lines: " + speeches.map(_.lineCount).sum)
+   val maleLines = linesForSpeeches(maleSpeeches)
+   print("\tby male speakers:" + maleLines)
+   val mLinePct = maleLines.toFloat / speeches.map(_.lineCount).sum
+   println(s" (${java.text.NumberFormat.getPercentInstance.format(mLinePct)})")
+
+
+   val femaleLines = linesForSpeeches(femaleSpeeches)
+   print("\tby female speakers:" + femaleLines)
+   val fLinePct = femaleLines.toFloat / speeches.map(_.lineCount).sum
+   println(s" (${java.text.NumberFormat.getPercentInstance.format(fLinePct)})")
 
 }
 
 
 
-def linesForSpeeches(speechList: Vector[Speech]): Int = {
-  0
-}
+
 /*n
 
 
@@ -198,9 +230,9 @@ val byBook = counts.map( c => (CtsUrn(c._2.passage.dropPassage + c._2.passage.ra
 println ("""
 
 
-This script defines two case classes:  Speaker and Speech
+This script defines two case classes, named Speaker and Speech
 
-It loads data from two files in the 'data' directory, and creates
+It loads data from files in the 'data' directory, and creates
 two objects:
 
 1.  speakers.  A Vector of Speaker objects.
