@@ -1,16 +1,37 @@
-
+//
+//  Load data for speeches and speakers, and define a couple
+//  of good functions for working with them.
+//
 import scala.io.Source
 import edu.holycross.shot.cite._
 
-case class Speaker (urn: Cite2Urn, label: String, gender: String)
-
-case class Speech (speech: Cite2Urn, speaker: Speaker, passage: CtsUrn)
-
-
+// The data files in this repo:
 val nameList = "data/speakersList.cex"
 val speechList = "data/speeches.cex"
 
-def loadSpeakers(fileName: String) = {
+
+/** A Speaker.
+* @param urn Idenfitier in hmt's personal name collection.
+* @param label Human-readable  extracted from hmt authnames list.
+* @param gender "m" or "f"
+*/
+case class Speaker (urn: Cite2Urn, label: String, gender: String)
+
+
+/** A Speech.
+* @param speech Identifier for an individual speech.
+* @param speaker The speaker.
+* @param passage Range of Iliadic lines for this speech.
+*/
+case class Speech (speech: Cite2Urn, speaker: Speaker, passage: CtsUrn)
+
+
+
+/** Load a Vector  of Speech obejcts from a file.
+*
+* @param fileName File with speech data.
+*/
+def loadSpeakers(fileName: String) : Vector[Speaker] = {
   val speakerList = Source.fromFile(fileName).getLines.toVector.drop(1)
   val speakers = for (n <- speakerList) yield {
     val cols = n.split("#")
@@ -24,9 +45,12 @@ def loadSpeakers(fileName: String) = {
 val speakers = loadSpeakers(nameList)
 
 
-// read a file of speech data, and create
-// a vector of Option[Speech] obejcts
-def speechOpts(fileName: String) = {
+/** Creates a Vector  of Option[Speech] obejcts from
+* the file commited to this repo's data directory.
+*
+* @param fileName Name of file with speech listings.
+*/
+def speechOpts(fileName: String) :  Vector[Option[Speech]]= {
   val speechData = Source.fromFile(fileName).getLines.toVector
 
   //Speech#Speaker#Passage
@@ -57,24 +81,29 @@ def speechOpts(fileName: String) = {
       }
     }
   }
-
-  println("\n\n")
-  println("Speech data read from  " + speechData.size + " lines of data.")
-  println("No speaker assigned for " + speechOpts.filter(_ == None).size + " data lines.")
   speechOpts
 }
-// load a vector of Speech objects from a afile
+val speechOptions = speechOpts(speechList)
+
+/** Load a Vector  of Speech obejcts from a file.
+*
+* @param fileName Name of file with speech listings.
+*/
 def loadSpeeches(fileName: String) = {
   speechOpts(fileName).flatten
 }
 val speeches = loadSpeeches(speechList)
 val distinctSpeakers = speeches.map(_.speaker).distinct
-// Speakers appearing in speakers' list,
-// with assignment of
 
 
 
-def reportForId(talker : Cite2Urn): Unit = {
+
+/** Print a summary report to standard output
+* for a speaker identified by Cite2Urn.
+*
+* @param talker Speaker to report on.
+*/
+def summarizeSpeaker(talker : Cite2Urn): Unit = {
 
   val speakerInfo = speakers.filter(_.urn == talker)
   val speakingTimes = speeches.filter(_.speaker.urn == talker)
@@ -85,12 +114,16 @@ def reportForId(talker : Cite2Urn): Unit = {
 
 }
 
-
-def speakerReport(label: String) : Unit = {
+/**
+* Summarize activity of a speaker.
+*
+* @param label String to look for in label for speaker.
+*/
+def speakerSummary(label: String) : Unit = {
   val speakerRecords = speakers.filter(_.label.toLowerCase.contains(label.toLowerCase))
   speakerRecords.size match {
     case 0 => println("No labels for speakers matched '" + label + "'.")
-    case 1 => reportForId( speakerRecords(0).urn )
+    case 1 => summarizeSpeaker( speakerRecords(0).urn )
     case _ => {
       println("More than one record matched '" + label + "' ")
       for (recrd <- speakerRecords) {
@@ -102,15 +135,29 @@ def speakerReport(label: String) : Unit = {
 }
 
 
+/** Print a summary to standard output. */
+def summary : Unit = {
+  val speechData = Source.fromFile(speechList).getLines.toVector
+  println("\n\nINPUTDATA")
+  println("Speech data read from  " + speechData.size + " lines of data.")
+  println("No speaker assigned for " + speechOptions.filter(_ == None).size + " data lines.")
+
+  println("\n\nSPEECH OBJECTS")
+  println("Total speeches: " + speeches.size )
+  println("Total speakers: " + distinctSpeakers.size )
+  println("\tby male speakers: " + distinctSpeakers.filter(_.gender == "m").size)
+  println("\tby female speakers: " + distinctSpeakers.filter(_.gender == "f").size)
+
+
+}
 
 
 
 
-println("Total speeches: " + speeches.size )
 /*
-println("\nNumber of speakers: " + distinctSpeakers.size)
-println("\tmale: " + distinctSpeakers.filter(_.gender == "m").size)
-println("\tfemale: " + distinctSpeakers.filter(_.gender == "f").size)
+
+
+
 
 
 println("\n\nTo see information on an individual speaker:")
@@ -158,3 +205,28 @@ val speakerNumbers = bySpeaker.map{ case (k,v) => k -> v.map( spCount => spCount
 
 val byBook = counts.map( c => (CtsUrn(c._2.passage.dropPassage + c._2.passage.rangeBegin).collapsePassageTo(1), c._1))
 */
+
+
+
+println ("""
+
+
+This script defines two case classes:  Speaker and Speech
+
+It loads data from two files in the 'data' directory, and creates
+two objects:
+
+1.  speakers.  A Vector of Speaker objects.
+2.  speeches.  A Vector of Speech objects.
+
+You can play with these directly, or use one of these two functions:
+
+1.  summary.  Prints a summary of the contents of the two Vetors.
+2.  speakerSummary(label: String).  Summarizes information about a
+specific speaker. Example:
+
+    speakerSummary("Achilles")
+
+
+"""
+)
